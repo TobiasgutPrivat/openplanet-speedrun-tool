@@ -17,6 +17,7 @@ void Main()
         startnew(waitForLiveSplitData);
     }
     else startnew(waitForEnableLiveSplit);
+    startnew(CoroutineFunc(g_SpeedrunWindow.Load));
 }
 
 void Update(float dt)

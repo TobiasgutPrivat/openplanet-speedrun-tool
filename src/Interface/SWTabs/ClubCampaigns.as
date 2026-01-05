@@ -9,40 +9,40 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
 
     bool IsVisible() override { return Permissions::PlayPublicClubCampaign(); }
 
-    void GetRequestParams(dictionary@ params) override
-    {
-        if (t_search.Length > 1) params.Set("search", t_search);
-        CampaignListSWTab::GetRequestParams(params);
-    }
+    // void GetRequestParams(dictionary@ params) override
+    // {
+    //     if (t_search.Length > 1) params.Set("search", t_search);
+    //     CampaignListSWTab::GetRequestParams(params);
+    // }
 
-    void CheckStartRequest() override
-    {
-        if (campaigns.Length == 0 && m_request is null && UI::IsWindowAppearing()) {
-            StartRequest();
-        }
+    // void CheckStartRequest() override
+    // {
+    //     if (campaigns.Length == 0 && m_request is null && UI::IsWindowAppearing()) {
+    //         StartRequest();
+    //     }
 
-        if (m_request !is null) {
-            return;
-        }
+    //     if (m_request !is null) {
+    //         return;
+    //     }
 
-        if (t_typingStart == 0) {
-            return;
-        }
+    //     if (t_typingStart == 0) {
+    //         return;
+    //     }
 
-        if (Time::Now > t_typingStart + 1000) {
-            t_typingStart = 0;
-            StartRequest();
-        }
-    }
+    //     if (Time::Now > t_typingStart + 1000) {
+    //         t_typingStart = 0;
+    //         StartRequest();
+    //     }
+    // }
 
-    void HandleResponse(const Json::Value &in json) override
-    {
-        auto items = json["campaigns"];
-        for (uint i = 0; i < items.Length; i++) {
-            CampaignSummary@ campaign = CampaignSummary(items[i]);
-            if (campaign.type == Campaigns::campaignType::Club) campaigns.InsertLast(campaign);
-        }
-    }
+    // void HandleResponse(const Json::Value &in json) override
+    // {
+    //     auto items = json["campaigns"];
+    //     for (uint i = 0; i < items.Length; i++) {
+    //         CampaignSummary@ campaign = CampaignSummary(items[i]);
+    //         if (campaign.type == Campaigns::campaignType::Club) campaigns.InsertLast(campaign);
+    //     }
+    // }
 
     void RenderHeader() override
     {

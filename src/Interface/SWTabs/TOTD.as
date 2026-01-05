@@ -43,7 +43,6 @@ class TOTDSelectSWTab : SWTab
             json["id"] = (diff - i + 1);
             json["clubid"] = 0;
             json["name"] = Time::FormatString("%B %Y", current_epoch);
-            json["timestamp"] = 0;
             json["mapcount"] = GetDaysInMonthEpoch(current_month, current_year) / 86400;
             json["type"] = "TOTD";
             CampaignSummary@ totd = CampaignSummary(json);

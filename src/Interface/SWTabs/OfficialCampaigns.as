@@ -8,11 +8,14 @@ class OfficialCampaignsSelectSWTab : CampaignListSWTab
 
     bool IsVisible() override { return Permissions::PlayCurrentOfficialQuarterlyCampaign(); }
 
-    void HandleResponse(const Json::Value &in json) override
-    {
-        auto items = json["campaigns"];
+    void Load() override{
+        if (campaigns.Length > 0) return;
+        auto json = API::CallLiveApiPath("/api/campaign/official?length=100");
+        Json::Value items = json["campaignList"];
         for (uint i = 0; i < items.Length; i++) {
+            items[i]["type"] = "Season";
             CampaignSummary@ campaign = CampaignSummary(items[i]);
+            if(IS_DEV_MODE) trace("OfficialCampaignsSelectSWTab::Load - found campaign: " + campaign.name + " (type: " + tostring(campaign.type) + ")");
             if (campaign.type == Campaigns::campaignType::Season) {
                 // Show past campaigns if the user has permissions
                 if (i > 0 && Permissions::PlayPastOfficialQuarterlyCampaign())

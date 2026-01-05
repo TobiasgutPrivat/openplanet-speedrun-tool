@@ -2,8 +2,8 @@ class CampaignSummary
 {
     int id;
     int clubid;
+    bool official;
     string name;
-    uint timestamp;
     int mapcount;
     string typeStr;
     Campaigns::campaignType type;
@@ -11,10 +11,9 @@ class CampaignSummary
     CampaignSummary(const Json::Value &in json)
     {
         id = json["id"];
-        clubid = json["clubid"];
+        if (json.HasKey("clubid") && json["clubid"].GetType() != Json::Type::Null) clubid = json["clubid"];
         name = json["name"];
-        timestamp = json["timestamp"];
-        mapcount = json["mapcount"];
+        mapcount = (json.HasKey("mapcount") && json["mapcount"].GetType() != Json::Type::Null) ? json["mapcount"] : json["playlist"].Length;
         if (json.HasKey("type") && json["type"].GetType() != Json::Type::Null) typeStr = json["type"];
         else typeStr = "Unknown";
 
@@ -39,7 +38,6 @@ class CampaignSummary
         json["id"] = id;
         json["clubid"] = clubid;
         json["name"] = name;
-        json["timestamp"] = timestamp;
         json["mapcount"] = mapcount;
         json["type"] = tostring(type);
         return json;
