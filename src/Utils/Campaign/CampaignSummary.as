@@ -7,14 +7,20 @@ class CampaignSummary
     int mapcount;
     string typeStr;
     Campaigns::campaignType type;
+    string[] mapUids;
 
     CampaignSummary(const Json::Value &in json)
     {
         id = json["id"];
-        if (json.HasKey("clubid") && json["clubid"].GetType() != Json::Type::Null) clubid = json["clubid"];
+        clubid = json["clubid"];
         name = json["name"];
         mapcount = (json.HasKey("mapcount") && json["mapcount"].GetType() != Json::Type::Null) ? json["mapcount"] : json["playlist"].Length;
         if (json.HasKey("type") && json["type"].GetType() != Json::Type::Null) typeStr = json["type"];
+        if (json.HasKey("playlist") && json["playlist"].GetType() != Json::Type::Null) {
+            for (uint i = 0; i < json["playlist"].Length; i++) {
+                mapUids.InsertLast(json["playlist"][i]["mapUid"]);
+            }
+        }
         else typeStr = "Unknown";
 
         // Parse type from tmio API (depending of the club id)

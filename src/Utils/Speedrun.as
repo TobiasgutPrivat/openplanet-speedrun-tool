@@ -361,7 +361,7 @@ namespace Speedrun
         CampaignSummary@ campaign = g_SpeedrunWindow.selectedCampaigns[0];
         g_speedrun.currentCampaignType = campaign.type;
         @g_speedrun.currentCampaign = campaign;
-        FetchCampaign(campaign.id, campaign.clubid);
+        FetchCampaign(campaign);
         g_speedrun.pastCampaigns.InsertLast(campaign);
         g_SpeedrunWindow.selectedCampaigns.RemoveAt(0);
         if (PluginSettings::HideUIOnLoadMap) UI::HideOverlay();
@@ -438,7 +438,7 @@ namespace Speedrun
                 g_speedrun.currentCampaignType = campaign.type;
                 @g_speedrun.currentCampaign = campaign;
                 UI::ShowNotification("Switching to campaign: " + (campaign.name));//ColoredString
-                FetchCampaign(campaign.id, campaign.clubid);
+                FetchCampaign(campaign);
                 g_speedrun.pastCampaigns.InsertLast(campaign);
                 g_SpeedrunWindow.selectedCampaigns.RemoveAt(0);
                 if (PluginSettings::WriteSpeedrunLog)
@@ -504,9 +504,15 @@ namespace Speedrun
         g_speedrun.mapPlaylist.RemoveRange(0, g_speedrun.mapPlaylist.Length);
     }
 
-    void FetchCampaign(int campaignId = 0, int clubId = 0)
+    void FetchCampaign(CampaignSummary@ campaign)
     {
         Json::Value tmioRes;
+        string mapUidList = "";
+        for (uint i = 0; i < campaign.mapUids.Length; i++) {
+            if (i > 0) mapUidList += ",";
+            mapUidList += campaign.mapUids[i];
+        }
+        Json::Value mapInfos;
         switch (g_speedrun.currentCampaignType)
         {
 			case Campaigns::campaignType::Training :
@@ -522,25 +528,25 @@ namespace Speedrun
 				break;
 			case Campaigns::campaignType::Season :
                 print("Season");
-                tmioRes = API::GetAsync("https://trackmania.io/api/officialcampaign/" + campaignId);
+                
+                mapInfos = API::CallLiveApiPath("/api/token/map/get-multiple?mapUidList=" + mapUidList);
+                // if (IS_DEV_MODE) trace(Json::Write(tmioRes, true));
 
-                for (uint i = 0; i < tmioRes["playlist"].Length; i++) {
-                    Json::Value mapJson = tmioRes["playlist"][i];
+                for (uint i = 0; i < mapInfos["mapList"].Length; i++) {
+                    Json::Value mapJson = mapInfos["mapList"][i];
                     MapInfo@ newmap = MapInfo();
-                    newmap.campaignId = tmioRes["id"];
+                    newmap.campaignId = campaign.id;
                     newmap.author = mapJson["author"];
                     newmap.name = mapJson["name"];
-                    newmap.filename = mapJson["filename"];
-                    newmap.uid = mapJson["mapUid"];
-                    newmap.file_url = mapJson["fileUrl"];
-                    newmap.exchange_id = mapJson["exchangeid"];
+                    newmap.uid = mapJson["mapId"];
+                    newmap.file_url = mapJson["downloadUrl"];
                     if (IS_DEV_MODE) trace("Adding map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
                     g_speedrun.mapPlaylist.InsertLast(newmap);
                 }
 				break;
 			case Campaigns::campaignType::TOTD :
                 print("TOTD");
-                tmioRes = API::GetAsync("https://trackmania.io/api/totd/" + campaignId);
+                tmioRes = API::GetAsync("https://trackmania.io/api/totd/" + campaign.id);
 
                 for (uint i = 0; i < tmioRes["days"].Length; i++) {
                     Json::Value dayJson = tmioRes["days"][i];
@@ -558,7 +564,7 @@ namespace Speedrun
 				break;
 			case Campaigns::campaignType::Club :
                 print("Club");
-                tmioRes = API::GetAsync("https://trackmania.io/api/campaign/" + clubId + "/" + campaignId);
+                tmioRes = API::GetAsync("https://trackmania.io/api/campaign/" + campaign.clubid + "/" + campaign.id);
 
                 for (uint i = 0; i < tmioRes["playlist"].Length; i++) {
                     Json::Value mapJson = tmioRes["playlist"][i];
@@ -575,7 +581,7 @@ namespace Speedrun
                 }
 				break;
 			default:
-				warn("Unknown campaign type for campaign " + campaignId);
+				warn("Unknown campaign type for campaign " + campaign.id);
         }
     }
 

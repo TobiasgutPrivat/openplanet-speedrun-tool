@@ -10,6 +10,7 @@ namespace API
         auto req = NadeoServices::Get("NadeoLiveServices", route);
         req.Start();
         while(!req.Finished()) { yield(); }
+        if (IS_DEV_MODE) trace("FetchLiveEndpoint: " + route + " -> " + req.String());
         _LastLiveEndpointRaw = req.String();
         return Json::Parse(_LastLiveEndpointRaw);
     }
