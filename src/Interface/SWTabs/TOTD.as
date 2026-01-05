@@ -3,10 +3,7 @@ class TOTDSelectSWTab : SWTab
 
     array<CampaignSummary@> campaigns;
 
-    TOTDSelectSWTab()
-    {
-        GetTOTDList();
-    }
+    TOTDSelectSWTab() {}
 
     string GetLabel() override { return Icons::Calendar + " Tracks of The Day"; }
 
@@ -14,51 +11,46 @@ class TOTDSelectSWTab : SWTab
 
     bool IsVisible() override { return Permissions::PlayCurrentOfficialMonthlyCampaign(); }
 
-    int64 GetDaysInMonthEpoch(int month, int year) {
-        int64 secondsInADay = 86400;
-        if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
-            return 31*secondsInADay;
-        if(month == 4 || month == 6 || month == 9 || month == 11)
-            return 30*secondsInADay;
-        if(month == 2) {
-            if (year % 4 == 0) {
-                return 29*secondsInADay;
-            } else {
-                return 28*secondsInADay;
-            }
-        }
-        return 0;
+    string GetMonthName(int month)
+    {
+        const array<string> months = {
+            "",          // index 0 unused
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        };
+
+        if (month < 1 || month > 12)
+            return "Invalid month";
+
+        return months[month];
     }
 
-    void GetTOTDList() {
-        int current_month = Text::ParseInt(Time::FormatString("%m"));
-        int current_year = Text::ParseInt(Time::FormatString("%Y"));
-
-        auto diff = current_month - 7 + (12 * (current_year - 2020));
-        int64 current_epoch = Time::get_Stamp() - (Text::ParseInt(Time::FormatString("%d"))*86400);
-
-        current_month--; //subtract 1 month, because we can't speedrun the current TOTD month
-        for(int i = diff; i > 0; i--) {
-            Json::Value json = Json::Object();
-            json["id"] = (diff - i + 1);
-            json["clubid"] = 0;
-            json["name"] = Time::FormatString("%B %Y", current_epoch);
-            json["mapcount"] = GetDaysInMonthEpoch(current_month, current_year) / 86400;
-            json["type"] = "TOTD";
-            CampaignSummary@ totd = CampaignSummary(json);
+    void Load() override {
+        auto json = API::CallLiveApiPath("/api/token/campaign/month?length=9999");
+        auto months = json["monthList"];
+        
+        for(int i = 1; i < months.Length; i++) {//ignore index 0, because we can't speedrun the current TOTD month
+            months[i]["id"] = (months[i]["year"] - 2020) * 12 + months[i]["month"];
+            months[i]["clubid"] = 0;
+            months[i]["playlist"] = months[i]["days"];
+            months[i]["name"] = GetMonthName(months[i]["month"]) + " " + Json::Write(months[i]["year"]);
+            months[i]["type"] = "TOTD";
+            CampaignSummary@ totd = CampaignSummary(months[i]);
 
             if (i > 0 && Permissions::PlayPastOfficialMonthlyCampaign())
                 campaigns.InsertLast(totd);
             else if (i == 0)
                 campaigns.InsertLast(totd);
-
-            current_epoch -= GetDaysInMonthEpoch(current_month, current_year);
-            if(current_month <= 1) {
-                current_month = 12;
-                current_year--;
-            } else {
-                current_month--;
-            }
         }
     }
 
@@ -67,19 +59,13 @@ class TOTDSelectSWTab : SWTab
         campaigns.RemoveRange(0, campaigns.Length);
     }
 
-    void Reload()
-    {
-        Clear();
-        GetTOTDList();
-    }
-
     void RenderReloadButton()
     {
         vec2 posOrig = UI::GetCursorPos();
         UI::SetCursorPos(vec2(UI::GetWindowSize().x-40, posOrig.y));
         if (UI::Button(Icons::Refresh))
         {
-            Reload();
+            Clear();
         }
         UI::SetCursorPos(vec2(posOrig.x, posOrig.y+12));
         UI::NewLine();

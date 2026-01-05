@@ -46,6 +46,11 @@ class CampaignSummary
         json["name"] = name;
         json["mapcount"] = mapcount;
         json["type"] = tostring(type);
+        json["playlist"] = Json::Array(); //TODO simplify
+        for (uint i = 0; i < mapUids.Length; i++) {
+            json["playlist"][i] = Json::Object();
+            json["playlist"][i]["mapUid"] = mapUids[i];
+        }
         return json;
     }
 }

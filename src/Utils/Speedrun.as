@@ -313,7 +313,7 @@ class Speedrun
         CGamePlayground@ GamePlayground = cast<CGamePlayground>(app.CurrentPlayground);
         if (app.RootMap !is null)
         {
-            if (playgroundScript !is null && GamePlayground.GameTerminals.get_Length() > 0)
+            if (playgroundScript !is null && GamePlayground.GameTerminals.Length > 0)
             {
                 CSmPlayer@ player = cast<CSmPlayer>(GamePlayground.GameTerminals[0].ControlledPlayer);
                 if (player !is null)
@@ -546,18 +546,17 @@ namespace Speedrun
 				break;
 			case Campaigns::campaignType::TOTD :
                 print("TOTD");
-                tmioRes = API::GetAsync("https://trackmania.io/api/totd/" + campaign.id);
+                mapInfos = API::CallLiveApiPath("/api/token/map/get-multiple?mapUidList=" + mapUidList);
+                // tmioRes = API::GetAsync("https://trackmania.io/api/totd/" + campaign.id);
 
-                for (uint i = 0; i < tmioRes["days"].Length; i++) {
-                    Json::Value dayJson = tmioRes["days"][i];
+                for (uint i = 0; i < mapInfos["mapList"].Length; i++) {
+                    Json::Value mapJson = mapInfos["mapList"][i];
                     MapInfo@ newmap = MapInfo();
-                    newmap.campaignId = dayJson["campaignid"];
-                    newmap.author = dayJson["map"]["authorplayer"]["name"];
-                    newmap.name = dayJson["map"]["name"];
-                    newmap.filename = dayJson["map"]["filename"];
-                    newmap.uid = dayJson["map"]["mapUid"];
-                    newmap.file_url = dayJson["map"]["fileUrl"];
-                    newmap.exchange_id = dayJson["map"]["exchangeid"];
+                    newmap.campaignId = campaign.id;
+                    newmap.author = mapJson["author"];
+                    newmap.name = mapJson["name"];
+                    newmap.uid = mapJson["mapId"];
+                    newmap.file_url = mapJson["downloadUrl"];
                     if (IS_DEV_MODE) trace("Adding TOTD map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
                     g_speedrun.mapPlaylist.InsertLast(newmap);
                 }
