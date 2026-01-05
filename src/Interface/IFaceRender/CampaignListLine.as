@@ -5,7 +5,7 @@ namespace IfaceRender
         UI::TableNextRow();
 
         UI::TableSetColumnIndex(0);
-        UI::Text(ColoredString(campaign.name));
+        UI::Text((campaign.name));//ColoredString
         UI::SameLine();
         // Check if the campaign is favorited
         bool isFav = false;

@@ -256,7 +256,7 @@ class Speedrun
             }
             logFileCode = base36DateTime;
 
-            string categoryName = StripFormatCodes(currentCampaign.name);
+            string categoryName = (currentCampaign.name);//StripFormatCodes
             if (g_LiveSplit !is null && g_LiveSplit.connected) {
                 categoryName = g_LiveSplit.getCategoryNameAsync();
             }
@@ -271,7 +271,7 @@ class Speedrun
         if (g_LiveSplit !is null && g_LiveSplit.connected) gameName = g_LiveSplit.getGameNameAsync();
         string liveSplitServerVersion = "";
         if (g_LiveSplit !is null && g_LiveSplit.connected) liveSplitServerVersion = " - LiveSplit Server version " + PluginSettings::LiveSplitServerVersion;
-        file.WriteLine(gameName + " - " + StripFormatCodes(currentCampaign.name) + " - started at " + Time::FormatString("%F %T"));
+        file.WriteLine(gameName + " - " + (currentCampaign.name) + " - started at " + Time::FormatString("%F %T"));//StripFormatCodes
         file.WriteLine("Speedrun plugin version " + Meta::ExecutingPlugin().Version + liveSplitServerVersion);
         file.WriteLine("Mode:" + PluginSettings::SpeedrunMode);
         file.WriteLine();
@@ -284,7 +284,7 @@ class Speedrun
     {
         IO::File file(logFileName);
         file.Open(IO::FileMode::Append);
-        string line = Speedrun::FormatTimer(SumCompleteTimeWithRespawns) + " | " + Speedrun::FormatTimer(MapCompleteTime) + " | " + StripFormatCodes(TMData.dMapInfo.MapName) + (isReset ? (" (Reset "+resetCounter+")") : "");
+        string line = Speedrun::FormatTimer(SumCompleteTimeWithRespawns) + " | " + Speedrun::FormatTimer(MapCompleteTime) + " | " + (TMData.dMapInfo.MapName) + (isReset ? (" (Reset "+resetCounter+")") : "");//StripFormatCodes
         print(line);
         file.WriteLine(line);
 	    file.Close();
@@ -298,7 +298,7 @@ class Speedrun
         if (isCanceled) file.WriteLine("Speedrun canceled at " + Time::FormatString("%F %T"));
         else file.WriteLine("End of speedrun at " + Time::FormatString("%F %T"));
 	    file.Close();
-        string categoryName = StripFormatCodes(pastCampaigns[0].name);
+        string categoryName = (pastCampaigns[0].name);//StripFormatCodes
         if (g_LiveSplit !is null && g_LiveSplit.connected) {
             categoryName = g_LiveSplit.getCategoryNameAsync();
         }
@@ -324,7 +324,7 @@ class Speedrun
                         auto ghost = playgroundScript.Ghost_RetrieveFromPlayer(playerScriptAPI);
                         if (ghost !is null)
                         {
-                            string safeMapName = StripFormatCodes(app.RootMap.MapName);
+                            string safeMapName = (app.RootMap.MapName);//StripFormatCodes
                             string safeUserName = ghost.Nickname;
                             string fmtGhostTime = Speedrun::FormatTimer(ghost.Result.Time).Replace(":", "-");
                             string replayName = mapCounter + " - " + safeMapName + " - " + safeUserName + " - " + Time::FormatString("%F_%H-%M-%S") + " (" + fmtGhostTime + ")";
@@ -371,7 +371,7 @@ namespace Speedrun
         while(!app.ManiaTitleControlScriptAPI.IsReady) {
             yield();
         }
-        UI::ShowNotification("Loading map...", ColoredString(g_speedrun.mapPlaylist[0].name));
+        UI::ShowNotification("Loading map...", (g_speedrun.mapPlaylist[0].name));//ColoredString
         g_speedrun.mapCounter = 1;
 #if DEPENDENCY_CHAOSMODE
             if (PluginSettings::SpeedrunMode == "Chaos Mode") {
@@ -418,7 +418,7 @@ namespace Speedrun
             while(!app.ManiaTitleControlScriptAPI.IsReady) {
                 yield();
             }
-            UI::ShowNotification("Loading map...", ColoredString(g_speedrun.mapPlaylist[0].name));
+            UI::ShowNotification("Loading map...", (g_speedrun.mapPlaylist[0].name));//ColoredString
             if (PluginSettings::HideUIOnLoadMap) UI::HideOverlay();
             g_speedrun.mapCounter++;
 #if DEPENDENCY_CHAOSMODE
@@ -437,7 +437,7 @@ namespace Speedrun
                 CampaignSummary@ campaign = g_SpeedrunWindow.selectedCampaigns[0];
                 g_speedrun.currentCampaignType = campaign.type;
                 @g_speedrun.currentCampaign = campaign;
-                UI::ShowNotification("Switching to campaign: " + ColoredString(campaign.name));
+                UI::ShowNotification("Switching to campaign: " + (campaign.name));//ColoredString
                 FetchCampaign(campaign.id, campaign.clubid);
                 g_speedrun.pastCampaigns.InsertLast(campaign);
                 g_SpeedrunWindow.selectedCampaigns.RemoveAt(0);
@@ -516,7 +516,7 @@ namespace Speedrun
                     newmap.campaignId = 3;
                     newmap.file_url = "Campaigns\\Training\\Training - " + Text::Format("%02d", i) + ".Map.Gbx";
                     newmap.name = "Training - " + Text::Format("%02d", i);
-                    if (IS_DEV_MODE) trace("Adding map: " + StripFormatCodes(newmap.name) + " to speedrun playlist");
+                    if (IS_DEV_MODE) trace("Adding map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
                     g_speedrun.mapPlaylist.InsertLast(newmap);
                 }
 				break;
@@ -534,7 +534,7 @@ namespace Speedrun
                     newmap.uid = mapJson["mapUid"];
                     newmap.file_url = mapJson["fileUrl"];
                     newmap.exchange_id = mapJson["exchangeid"];
-                    if (IS_DEV_MODE) trace("Adding map: " + StripFormatCodes(newmap.name) + " to speedrun playlist");
+                    if (IS_DEV_MODE) trace("Adding map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
                     g_speedrun.mapPlaylist.InsertLast(newmap);
                 }
 				break;
@@ -552,7 +552,7 @@ namespace Speedrun
                     newmap.uid = dayJson["map"]["mapUid"];
                     newmap.file_url = dayJson["map"]["fileUrl"];
                     newmap.exchange_id = dayJson["map"]["exchangeid"];
-                    if (IS_DEV_MODE) trace("Adding TOTD map: " + StripFormatCodes(newmap.name) + " to speedrun playlist");
+                    if (IS_DEV_MODE) trace("Adding TOTD map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
                     g_speedrun.mapPlaylist.InsertLast(newmap);
                 }
 				break;
@@ -570,7 +570,7 @@ namespace Speedrun
                     newmap.uid = mapJson["mapUid"];
                     newmap.file_url = mapJson["fileUrl"];
                     newmap.exchange_id = mapJson["exchangeid"];
-                    if (IS_DEV_MODE) trace("Adding map: " + StripFormatCodes(newmap.name) + " to speedrun playlist");
+                    if (IS_DEV_MODE) trace("Adding map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
                     g_speedrun.mapPlaylist.InsertLast(newmap);
                 }
 				break;
