@@ -2,7 +2,6 @@ class CampaignSummary
 {
     int id;
     int clubid;
-    bool official;
     string name;
     int mapcount;
     string typeStr;
@@ -12,23 +11,22 @@ class CampaignSummary
     CampaignSummary(const Json::Value &in json)
     {
         id = json["id"];
-        clubid = json["clubid"];
         name = json["name"];
-        mapcount = (json.HasKey("mapcount") && json["mapcount"].GetType() != Json::Type::Null) ? json["mapcount"] : json["playlist"].Length;
-        if (json.HasKey("type") && json["type"].GetType() != Json::Type::Null) typeStr = json["type"];
-        if (json.HasKey("playlist") && json["playlist"].GetType() != Json::Type::Null) {
+        if (json.HasKey("clubid") && json["clubid"].GetType() != Json::Type::Null) {
+            // for club campaigns
+            clubid = json["clubid"];
+            mapcount = json["mapcount"];
+        } else if (json.HasKey("playlist") && json["playlist"].GetType() != Json::Type::Null) {
+            //for seasonal/TOTD campaigns
+            auto playlist = json["playlist"];
+            mapcount = playlist.Length;
             for (uint i = 0; i < json["playlist"].Length; i++) {
                 mapUids.InsertLast(json["playlist"][i]["mapUid"]);
             }
         }
-        else typeStr = "Unknown";
 
-        // Parse type from tmio API (depending of the club id)
-        if (typeStr == "Unknown")
-        {
-            if (clubid == 0) typeStr = "Season";
-            else typeStr = "Club";
-        }
+        if (json.HasKey("type") && json["type"].GetType() != Json::Type::Null) typeStr = json["type"];
+        else typeStr = "Unknown";
 
         // we need to convert string to enum
         if (typeStr == "Season") type = Campaigns::campaignType::Season;

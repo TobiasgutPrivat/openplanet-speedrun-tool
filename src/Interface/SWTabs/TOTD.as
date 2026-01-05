@@ -41,7 +41,6 @@ class TOTDSelectSWTab : SWTab
         
         for(int i = 1; i < months.Length; i++) {//ignore index 0, because we can't speedrun the current TOTD month
             months[i]["id"] = (months[i]["year"] - 2020) * 12 + months[i]["month"];
-            months[i]["clubid"] = 0;
             months[i]["playlist"] = months[i]["days"];
             months[i]["name"] = GetMonthName(months[i]["month"]) + " " + Json::Write(months[i]["year"]);
             months[i]["type"] = "TOTD";

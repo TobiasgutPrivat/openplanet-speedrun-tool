@@ -14,7 +14,6 @@ class OfficialCampaignsSelectSWTab : CampaignListSWTab
         Json::Value items = json["campaignList"];
         for (uint i = 0; i < items.Length; i++) {
             items[i]["type"] = "Season";
-            items[i]["clubid"] = 0;
             CampaignSummary@ campaign = CampaignSummary(items[i]);
             if (campaign.type == Campaigns::campaignType::Season) {
                 // Show past campaigns if the user has permissions

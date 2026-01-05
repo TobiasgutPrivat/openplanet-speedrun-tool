@@ -6,7 +6,6 @@ class TrainingSelectSWTab : SWTab
     {
         Json::Value json = Json::Object();
         json["id"] = 0;
-        json["clubid"] = 0;
         json["name"] = "Training";
         json["mapcount"] = 25;
         json["type"] = "Training";
