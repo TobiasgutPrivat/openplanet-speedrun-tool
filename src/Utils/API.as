@@ -11,6 +11,7 @@ namespace API
         req.Start();
         while(!req.Finished()) { yield(); }
         if (IS_DEV_MODE) trace("FetchLiveEndpoint: " + route + " -> " + req.String());
+        // if (IS_DEV_MODE) trace("FetchLiveEndpoint Response Code: " + req.ResponseCode());
         _LastLiveEndpointRaw = req.String();
         return Json::Parse(_LastLiveEndpointRaw);
     }

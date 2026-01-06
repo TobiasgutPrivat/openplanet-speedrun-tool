@@ -23,9 +23,16 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
         Json::Value items = json["clubCampaignList"];
         moreavailable = items.Length == pageSize;
         for (uint i = 0; i < items.Length; i++) {
-        // Json::ToFile(IO::FromStorageFolder(i + "temp.json"),items);
-            items[i]["playlist"] = items[i]["campaign"]["playlist"];
-            CampaignSummary@ campaign = CampaignSummary(items[i]);
+            auto json = Json::Object();
+            json["id"] = items[i]["id"];
+            json["name"] = items[i]["name"];
+            json["type"] = "Club";
+            json["mapUids"] = Json::Array();
+            auto playlist = items[i]["campaign"]["playlist"];
+            for (uint j = 0; j < playlist.Length; j++) {
+                json["mapUids"].Add(playlist[j]["mapUid"]);
+            }
+            CampaignSummary@ campaign = CampaignSummary(json);
             campaigns.InsertLast(campaign);
         }
     }

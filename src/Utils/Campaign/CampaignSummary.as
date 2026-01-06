@@ -1,28 +1,18 @@
 class CampaignSummary
 {
     int id;
-    int clubid;
+    // int clubid;
     string name;
-    int mapcount;
+    // int mapcount;
     string typeStr;
     Campaigns::campaignType type;
-    string[] mapUids;
+    Json::Value mapUids;
 
     CampaignSummary(const Json::Value &in json)
     {
         id = json["id"];
         name = json["name"];
-        if (json.HasKey("clubid") && json["clubid"].GetType() != Json::Type::Null) clubid = json["clubid"];
-        if (json.HasKey("mapcount") && json["mapcount"].GetType() != Json::Type::Null) mapcount = json["mapcount"];
-        if (json.HasKey("playlist") && json["playlist"].GetType() != Json::Type::Null) {
-            //for seasonal/TOTD campaigns
-            auto playlist = json["playlist"];
-            mapcount = playlist.Length;
-            for (uint i = 0; i < json["playlist"].Length; i++) {
-                mapUids.InsertLast(json["playlist"][i]["mapUid"]);
-            }
-        }
-
+        if (json.HasKey("mapUids") && json["mapUids"].GetType() != Json::Type::Null) mapUids = json["mapUids"];
         if (json.HasKey("type") && json["type"].GetType() != Json::Type::Null) typeStr = json["type"];
         else typeStr = "Unknown";
 
@@ -38,9 +28,7 @@ class CampaignSummary
     {
         Json::Value json = Json::Object();
         json["id"] = id;
-        json["clubid"] = clubid;
         json["name"] = name;
-        json["mapcount"] = mapcount;
         json["type"] = tostring(type);
         json["playlist"] = Json::Array(); //TODO simplify
         for (uint i = 0; i < mapUids.Length; i++) {

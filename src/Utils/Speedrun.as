@@ -506,13 +506,29 @@ namespace Speedrun
 
     void FetchCampaign(CampaignSummary@ campaign)
     {
-        Json::Value tmioRes;
-        string mapUidList = "";
-        for (uint i = 0; i < campaign.mapUids.Length; i++) {
-            if (i > 0) mapUidList += ",";
-            mapUidList += campaign.mapUids[i];
+        if (campaign.mapUids.Length > 0) {
+            string mapUidList = "";
+
+            for (uint i = 0; i < campaign.mapUids.Length; i++) {
+                if (i > 0) mapUidList += ",";
+                mapUidList += campaign.mapUids[i];
+            }
+
+            mapInfos = API::CallLiveApiPath("/api/token/map/get-multiple?mapUidList=" + mapUidList);
+
+            for (uint i = 0; i < mapInfos["mapList"].Length; i++) {
+                Json::Value mapJson = mapInfos["mapList"][i];
+                MapInfo@ newmap = MapInfo();
+                newmap.campaignId = campaign.id;
+                newmap.author = mapJson["author"];
+                newmap.name = mapJson["name"];
+                newmap.uid = mapJson["mapId"];
+                newmap.file_url = mapJson["downloadUrl"];
+                if (IS_DEV_MODE) trace("Adding map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
+                g_speedrun.mapPlaylist.InsertLast(newmap);
+            }
         }
-        // if(IS_DEV_MODE) trace("Fetching campaign " + campaign.id + " of type " + int(campaign.type) + " with maps: " + mapUidList);
+        
         Json::Value mapInfos;
         switch (g_speedrun.currentCampaignType)
         {
@@ -529,55 +545,12 @@ namespace Speedrun
 				break;
 			case Campaigns::campaignType::Season :
                 print("Season");
-                
-                mapInfos = API::CallLiveApiPath("/api/token/map/get-multiple?mapUidList=" + mapUidList);
-                // if (IS_DEV_MODE) trace(Json::Write(tmioRes, true));
-
-                for (uint i = 0; i < mapInfos["mapList"].Length; i++) {
-                    Json::Value mapJson = mapInfos["mapList"][i];
-                    MapInfo@ newmap = MapInfo();
-                    newmap.campaignId = campaign.id;
-                    newmap.author = mapJson["author"];
-                    newmap.name = mapJson["name"];
-                    newmap.uid = mapJson["mapId"];
-                    newmap.file_url = mapJson["downloadUrl"];
-                    if (IS_DEV_MODE) trace("Adding map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
-                    g_speedrun.mapPlaylist.InsertLast(newmap);
-                }
 				break;
 			case Campaigns::campaignType::TOTD :
                 print("TOTD");
-                mapInfos = API::CallLiveApiPath("/api/token/map/get-multiple?mapUidList=" + mapUidList);
-                // tmioRes = API::GetAsync("https://trackmania.io/api/totd/" + campaign.id);
-
-                for (uint i = 0; i < mapInfos["mapList"].Length; i++) {
-                    Json::Value mapJson = mapInfos["mapList"][i];
-                    MapInfo@ newmap = MapInfo();
-                    newmap.campaignId = campaign.id;
-                    newmap.author = mapJson["author"];
-                    newmap.name = mapJson["name"];
-                    newmap.uid = mapJson["mapId"];
-                    newmap.file_url = mapJson["downloadUrl"];
-                    if (IS_DEV_MODE) trace("Adding TOTD map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
-                    g_speedrun.mapPlaylist.InsertLast(newmap);
-                }
 				break;
 			case Campaigns::campaignType::Club :
                 print("Club");
-                mapInfos = API::CallLiveApiPath("/api/token/map/get-multiple?mapUidList=" + mapUidList);
-                // tmioRes = API::GetAsync("https://trackmania.io/api/campaign/" + campaign.clubid + "/" + campaign.id);
-
-                for (uint i = 0; i < mapInfos["playlist"].Length; i++) {
-                    Json::Value mapJson = mapInfos["playlist"][i];
-                    MapInfo@ newmap = MapInfo();
-                    newmap.campaignId = campaign.id;
-                    newmap.author = mapJson["author"];
-                    newmap.name = mapJson["name"];
-                    newmap.uid = mapJson["mapId"];
-                    newmap.file_url = mapJson["downloadUrl"];
-                    if (IS_DEV_MODE) trace("Adding map: " + (newmap.name) + " to speedrun playlist");//StripFormatCodes
-                    g_speedrun.mapPlaylist.InsertLast(newmap);
-                }
 				break;
 			default:
 				warn("Unknown campaign type for campaign " + campaign.id);

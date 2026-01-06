@@ -11,10 +11,18 @@ class OfficialCampaignsSelectSWTab : CampaignListSWTab
     void Load() override{
         if (campaigns.Length > 0) return;
         auto json = API::CallLiveApiPath("/api/campaign/official?length=9999");
+        trace(Json::Write(json));
         Json::Value items = json["campaignList"];
         for (uint i = 0; i < items.Length; i++) {
-            items[i]["type"] = "Season";
-            CampaignSummary@ campaign = CampaignSummary(items[i]);
+            auto json = Json::Object();
+            json["id"] = items[i]["id"];
+            json["name"] = items[i]["name"];
+            json["type"] = "Season";
+            json["mapUids"] = Json::Array();
+            for (uint j = 0; j < items[i]["playlist"].Length; j++) {
+                json["mapUids"].Add(items[i]["playlist"][j]["mapUid"]);
+            }
+            CampaignSummary@ campaign = CampaignSummary(json);
             if (campaign.type == Campaigns::campaignType::Season) {
                 // Show past campaigns if the user has permissions
                 if (i > 0 && Permissions::PlayPastOfficialQuarterlyCampaign())

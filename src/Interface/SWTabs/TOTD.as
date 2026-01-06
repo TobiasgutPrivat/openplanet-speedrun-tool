@@ -38,15 +38,18 @@ class TOTDSelectSWTab : SWTab
     void Load() override {
         if (campaigns.Length > 0) return;
         auto json = API::CallLiveApiPath("/api/token/campaign/month?length=9999");
-        auto months = json["monthList"];
+        auto items = json["monthList"];
         
-        for(int i = 1; i < months.Length; i++) {//ignore index 0, because we can't speedrun the current TOTD month
-            months[i]["id"] = (months[i]["year"] - 2020) * 12 + months[i]["month"];
-            months[i]["playlist"] = months[i]["days"];
-            months[i]["name"] = GetMonthName(months[i]["month"]) + " " + Json::Write(months[i]["year"]);
-            months[i]["type"] = "TOTD";
-            CampaignSummary@ totd = CampaignSummary(months[i]);
-
+        for(int i = 1; i < items.Length; i++) {//ignore index 0, because we can't speedrun the current TOTD month
+            auto json = Json::Object();
+            json["id"] = (items[i]["year"] - 2020) * 12 + items[i]["month"];
+            json["name"] = GetMonthName(items[i]["month"]) + " " + Json::Write(items[i]["year"]);
+            json["type"] = "TOTD";
+            json["mapUids"] = Json::Array();
+            for (uint j = 0; j < items[i]["days"].Length; j++) {
+                json["mapUids"].Add(items[i]["days"][j]["mapUid"]);
+            }
+            CampaignSummary@ totd = CampaignSummary(json);
             if (i > 0 && Permissions::PlayPastOfficialMonthlyCampaign())
                 campaigns.InsertLast(totd);
             else if (i == 0)
