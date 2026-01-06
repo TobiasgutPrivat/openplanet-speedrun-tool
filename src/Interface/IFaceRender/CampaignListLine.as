@@ -5,7 +5,7 @@ namespace IfaceRender
         UI::TableNextRow();
 
         UI::TableSetColumnIndex(0);
-        UI::Text((campaign.name));//ColoredString
+        UI::Text(Text::OpenplanetFormatCodes(campaign.name));
         UI::SameLine();
         // Check if the campaign is favorited
         bool isFav = false;

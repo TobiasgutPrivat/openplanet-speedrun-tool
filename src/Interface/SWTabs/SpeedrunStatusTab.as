@@ -180,7 +180,7 @@ class SpeedrunStatusTab : SWTab
                 g_SpeedrunWindow.selectedCampaigns.RemoveAt(i);
             }
 			UI::SameLine();
-			UI::Text((campaign.name));//ColoredString
+			UI::Text(Text::OpenplanetFormatCodes(campaign.name));
             UI::SameLine();
             // Check if the campaign is favorited
             bool isFav = false;
