@@ -12,11 +12,9 @@ class CampaignSummary
     {
         id = json["id"];
         name = json["name"];
-        if (json.HasKey("clubid") && json["clubid"].GetType() != Json::Type::Null) {
-            // for club campaigns
-            clubid = json["clubid"];
-            mapcount = json["mapcount"];
-        } else if (json.HasKey("playlist") && json["playlist"].GetType() != Json::Type::Null) {
+        if (json.HasKey("clubid") && json["clubid"].GetType() != Json::Type::Null) clubid = json["clubid"];
+        if (json.HasKey("mapcount") && json["mapcount"].GetType() != Json::Type::Null) mapcount = json["mapcount"];
+        if (json.HasKey("playlist") && json["playlist"].GetType() != Json::Type::Null) {
             //for seasonal/TOTD campaigns
             auto playlist = json["playlist"];
             mapcount = playlist.Length;

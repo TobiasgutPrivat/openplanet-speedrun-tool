@@ -2,6 +2,9 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
 {
     string t_search;
     uint64 t_typingStart;
+    int request = 50;
+    int pageSize = 50;
+    bool moreavailable = true;
 
     string GetLabel() override { return Icons::Cubes + " Club Campaigns"; }
 
@@ -9,40 +12,23 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
 
     bool IsVisible() override { return Permissions::PlayPublicClubCampaign(); }
 
-    // void GetRequestParams(dictionary@ params) override
-    // {
-    //     if (t_search.Length > 1) params.Set("search", t_search);
-    //     CampaignListSWTab::GetRequestParams(params);
-    // }
-
-    // void CheckStartRequest() override
-    // {
-    //     if (campaigns.Length == 0 && m_request is null && UI::IsWindowAppearing()) {
-    //         StartRequest();
-    //     }
-
-    //     if (m_request !is null) {
-    //         return;
-    //     }
-
-    //     if (t_typingStart == 0) {
-    //         return;
-    //     }
-
-    //     if (Time::Now > t_typingStart + 1000) {
-    //         t_typingStart = 0;
-    //         StartRequest();
-    //     }
-    // }
-
-    // void HandleResponse(const Json::Value &in json) override
-    // {
-    //     auto items = json["campaigns"];
-    //     for (uint i = 0; i < items.Length; i++) {
-    //         CampaignSummary@ campaign = CampaignSummary(items[i]);
-    //         if (campaign.type == Campaigns::campaignType::Club) campaigns.InsertLast(campaign);
-    //     }
-    // }
+    void Load() override {
+        if (campaigns.Length >= request) return;
+        string requestedSearch = t_search;
+        auto json = API::CallLiveApiPath("/api/token/club/campaign?length="+pageSize+"&offset="+campaigns.Length+"&name="+t_search);
+        if (requestedSearch != t_search) {
+            // Search term changed while we were loading
+            return;
+        }
+        Json::Value items = json["clubCampaignList"];
+        moreavailable = items.Length == pageSize;
+        for (uint i = 0; i < items.Length; i++) {
+        // Json::ToFile(IO::FromStorageFolder(i + "temp.json"),items);
+            items[i]["playlist"] = items[i]["campaign"]["playlist"];
+            CampaignSummary@ campaign = CampaignSummary(items[i]);
+            campaigns.InsertLast(campaign);
+        }
+    }
 
     void RenderHeader() override
     {
@@ -57,5 +43,12 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
             }
         }
         UI::SameLine();
+    }
+    
+    void RenderEnd() override
+    {
+        if (ShowLoadMore() && moreavailable && UI::GreenButton("Load more")){
+            request += pageSize;
+        }
     }
 }

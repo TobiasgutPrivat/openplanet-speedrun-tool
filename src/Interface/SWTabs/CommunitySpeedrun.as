@@ -4,6 +4,7 @@ class CommunitySpeedrunSWTab : SWTab
 
     CommunitySpeedrunSWTab()
     {
+        //TODO use /api/token/club/{clubID}/campaign/{campaignID}
         Json::Value json = Json::Object();
         json["id"] = 32622;
         json["clubid"] = 2080;

@@ -36,6 +36,7 @@ class TOTDSelectSWTab : SWTab
     }
 
     void Load() override {
+        if (campaigns.Length > 0) return;
         auto json = API::CallLiveApiPath("/api/token/campaign/month?length=9999");
         auto months = json["monthList"];
         

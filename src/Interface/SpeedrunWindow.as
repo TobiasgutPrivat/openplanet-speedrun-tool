@@ -27,8 +27,11 @@ class SpeedrunWindow
     }
 
     void Load(){
-        for (uint i = 0; i < tabs.Length; i++) {
-            tabs[i].Load();
+        while (true){
+            for (uint i = 0; i < tabs.Length; i++) {
+                tabs[i].Load();
+            }
+            yield();
         }
     }
 

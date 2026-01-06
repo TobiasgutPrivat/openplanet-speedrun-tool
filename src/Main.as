@@ -10,6 +10,7 @@ void Main()
 
     @g_speedrun = Speedrun();
     @g_SpeedrunWindow = SpeedrunWindow();
+    startnew(CoroutineFunc(g_SpeedrunWindow.Load));
     @g_LiveSplitDevWindow = LiveSplitDevWindow();
     if (PluginSettings::LiveSplitClientEnabled)
     {
@@ -17,7 +18,6 @@ void Main()
         startnew(waitForLiveSplitData);
     }
     else startnew(waitForEnableLiveSplit);
-    startnew(CoroutineFunc(g_SpeedrunWindow.Load));
 }
 
 void Update(float dt)

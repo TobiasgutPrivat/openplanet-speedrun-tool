@@ -62,12 +62,11 @@ class CampaignListSWTab : SWTab
                     }
                 }
                 UI::EndTable();
-                if (m_request is null && ShowLoadMore() && UI::GreenButton("Load more")){
-                    m_page++;
-                    // StartRequest();
-                }
+                RenderEnd();
             }
             UI::EndChild();
         }
     }
+
+    void RenderEnd() {}
 }
