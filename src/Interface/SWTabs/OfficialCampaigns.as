@@ -10,9 +10,8 @@ class OfficialCampaignsSelectSWTab : CampaignListSWTab
 
     void Load() override{
         if (campaigns.Length > 0) return;
-        auto json = API::CallLiveApiPath("/api/campaign/official?length=9999");
-        trace(Json::Write(json));
-        Json::Value items = json["campaignList"];
+        auto result = API::CallLiveApiPath("/api/campaign/official?length=9999");
+        Json::Value items = result["campaignList"];
         for (uint i = 0; i < items.Length; i++) {
             auto json = Json::Object();
             json["id"] = items[i]["id"];

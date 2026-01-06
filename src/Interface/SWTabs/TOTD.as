@@ -37,8 +37,8 @@ class TOTDSelectSWTab : SWTab
 
     void Load() override {
         if (campaigns.Length > 0) return;
-        auto json = API::CallLiveApiPath("/api/token/campaign/month?length=9999");
-        auto items = json["monthList"];
+        auto result = API::CallLiveApiPath("/api/token/campaign/month?length=9999");
+        auto items = result["monthList"];
         
         for(int i = 1; i < items.Length; i++) {//ignore index 0, because we can't speedrun the current TOTD month
             auto json = Json::Object();

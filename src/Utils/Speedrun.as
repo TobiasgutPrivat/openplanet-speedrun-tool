@@ -514,7 +514,7 @@ namespace Speedrun
                 mapUidList += campaign.mapUids[i];
             }
 
-            mapInfos = API::CallLiveApiPath("/api/token/map/get-multiple?mapUidList=" + mapUidList);
+            Json::Value mapInfos = API::CallLiveApiPath("/api/token/map/get-multiple?mapUidList=" + mapUidList);
 
             for (uint i = 0; i < mapInfos["mapList"].Length; i++) {
                 Json::Value mapJson = mapInfos["mapList"][i];
@@ -529,7 +529,6 @@ namespace Speedrun
             }
         }
         
-        Json::Value mapInfos;
         switch (g_speedrun.currentCampaignType)
         {
 			case Campaigns::campaignType::Training :

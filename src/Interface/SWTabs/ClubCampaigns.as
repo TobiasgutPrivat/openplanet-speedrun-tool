@@ -15,12 +15,12 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
     void Load() override {
         if (campaigns.Length >= request) return;
         string requestedSearch = t_search;
-        auto json = API::CallLiveApiPath("/api/token/club/campaign?length="+pageSize+"&offset="+campaigns.Length+"&name="+t_search);
+        auto result = API::CallLiveApiPath("/api/token/club/campaign?length="+pageSize+"&offset="+campaigns.Length+"&name="+t_search);
         if (requestedSearch != t_search) {
             // Search term changed while we were loading
             return;
         }
-        Json::Value items = json["clubCampaignList"];
+        Json::Value items = result["clubCampaignList"];
         moreavailable = items.Length == pageSize;
         for (uint i = 0; i < items.Length; i++) {
             auto json = Json::Object();

@@ -2,16 +2,18 @@ class CommunitySpeedrunSWTab : SWTab
 {
     CampaignSummary@ CommunitySpeedrun;
 
-    CommunitySpeedrunSWTab()
-    {
-        //TODO use /api/token/club/{clubID}/campaign/{campaignID}
+    void Load() override {
+        if (CommunitySpeedrun !is null) return; // already loaded
         Json::Value json = Json::Object();
         json["id"] = 32622;
-        json["clubid"] = 2080;
         json["name"] = "Community $fc0Speedrun";
-        json["timestamp"] = 1668174869;
-        json["mapcount"] = 25;
         json["type"] = "Club";
+        json["mapUids"] = Json::Array();
+        auto result = API::CallLiveApiPath("/api/token/club/2080/campaign/32622");
+        auto playlist = result["campaign"]["playlist"];
+        for (uint i = 0; i < playlist.Length; i++) {
+            json["mapUids"].Add(playlist[i]["mapUid"]);
+        }
         @CommunitySpeedrun = CampaignSummary(json);
     }
 

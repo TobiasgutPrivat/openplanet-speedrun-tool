@@ -6,12 +6,9 @@ namespace API
         NadeoServices::AddAudience("NadeoLiveServices");
         while (!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
 
-        // log_trace("[FetchLiveEndpoint] Requesting: " + route);
         auto req = NadeoServices::Get("NadeoLiveServices", route);
         req.Start();
         while(!req.Finished()) { yield(); }
-        if (IS_DEV_MODE) trace("FetchLiveEndpoint: " + route + " -> " + req.String());
-        // if (IS_DEV_MODE) trace("FetchLiveEndpoint Response Code: " + req.ResponseCode());
         _LastLiveEndpointRaw = req.String();
         return Json::Parse(_LastLiveEndpointRaw);
     }
