@@ -13,6 +13,8 @@ class CampaignListSWTab : SWTab
     void Clear()
     {
         campaigns.RemoveRange(0, campaigns.Length);
+        moreavailable = true;
+        request = pageSize;
     }
 
     void Load() override {
