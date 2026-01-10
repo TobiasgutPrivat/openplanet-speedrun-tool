@@ -2,7 +2,9 @@ class CampaignListSWTab : SWTab
 {
     Net::HttpRequest@ m_request;
     array<CampaignSummary@> campaigns;
-    int m_page = 0;
+    int request = 50;
+    int pageSize = 50;
+    bool moreavailable = true;
 
     bool ShowLoadMore() { return true; }
 
@@ -62,11 +64,12 @@ class CampaignListSWTab : SWTab
                     }
                 }
                 UI::EndTable();
-                RenderEnd();
+                if (ShowLoadMore() && moreavailable && UI::GreenButton("Load more")){
+                    request += pageSize;
+                }
             }
             UI::EndChild();
         }
     }
 
-    void RenderEnd() {}
 }

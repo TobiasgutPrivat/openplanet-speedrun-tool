@@ -1,7 +1,5 @@
 class OfficialCampaignsSelectSWTab : CampaignListSWTab
 {
-    bool ShowLoadMore() override { return false; }
-
     string GetLabel() override { return Icons::Globe + " Seasonal Campaigns"; }
 
     vec4 GetColor() override { return vec4(0.6, 0.43, 0.22, 1); }
@@ -9,9 +7,10 @@ class OfficialCampaignsSelectSWTab : CampaignListSWTab
     bool IsVisible() override { return Permissions::PlayCurrentOfficialQuarterlyCampaign(); }
 
     void Load() override{
-        if (campaigns.Length > 0) return;
-        auto result = API::CallLiveApiPath("/api/campaign/official?length=9999");
+        if (campaigns.Length >= request || !moreavailable) return;
+        auto result = API::CallLiveApiPath("/api/campaign/official?length="+pageSize+"&offset="+campaigns.Length);
         Json::Value items = result["campaignList"];
+        moreavailable = items.Length == pageSize;
         for (uint i = 0; i < items.Length; i++) {
             auto json = Json::Object();
             json["id"] = items[i]["id"];

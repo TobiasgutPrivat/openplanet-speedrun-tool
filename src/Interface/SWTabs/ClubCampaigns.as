@@ -2,9 +2,6 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
 {
     string t_search;
     uint64 t_typingStart;
-    int request = 50;
-    int pageSize = 50;
-    bool moreavailable = true;
 
     string GetLabel() override { return Icons::Cubes + " Club Campaigns"; }
 
@@ -13,7 +10,7 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
     bool IsVisible() override { return Permissions::PlayPublicClubCampaign(); }
 
     void Load() override {
-        if (campaigns.Length >= request) return;
+        if (campaigns.Length >= request || !moreavailable) return;
         string requestedSearch = t_search;
         auto result = API::CallLiveApiPath("/api/token/club/campaign?length="+pageSize+"&offset="+campaigns.Length+"&name="+t_search);
         if (requestedSearch != t_search) {
@@ -50,12 +47,5 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
             }
         }
         UI::SameLine();
-    }
-    
-    void RenderEnd() override
-    {
-        if (ShowLoadMore() && moreavailable && UI::GreenButton("Load more")){
-            request += pageSize;
-        }
     }
 }
