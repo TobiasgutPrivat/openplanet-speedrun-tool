@@ -1,9 +1,7 @@
 class CampaignSummary
 {
     int id;
-    // int clubid;
     string name;
-    // int mapcount;
     string typeStr;
     Campaigns::campaignType type;
     Json::Value mapUids;
@@ -30,11 +28,7 @@ class CampaignSummary
         json["id"] = id;
         json["name"] = name;
         json["type"] = tostring(type);
-        json["playlist"] = Json::Array(); //TODO simplify
-        for (uint i = 0; i < mapUids.Length; i++) {
-            json["playlist"][i] = Json::Object();
-            json["playlist"][i]["mapUid"] = mapUids[i];
-        }
+        json["mapUids"] = mapUids;
         return json;
     }
 }

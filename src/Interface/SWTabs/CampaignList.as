@@ -21,9 +21,6 @@ class CampaignListSWTab : SWTab
         if (moreavailable && campaigns.Length < request) {
             LoadCampaigns(pageSize, campaigns.Length);
             moreavailable = (campaigns.Length % pageSize) == 0;
-            trace(moreavailable);
-            trace(campaigns.Length);
-            trace(pageSize);
         }
     }
 
