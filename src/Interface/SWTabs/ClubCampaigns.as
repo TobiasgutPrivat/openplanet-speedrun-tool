@@ -9,16 +9,14 @@ class ClubCampaignsSelectSWTab : CampaignListSWTab
 
     bool IsVisible() override { return Permissions::PlayPublicClubCampaign(); }
 
-    void Load() override {
-        if (campaigns.Length >= request || !moreavailable) return;
+    void LoadCampaigns(int count, int offset) override {
         string requestedSearch = t_search;
-        auto result = API::CallLiveApiPath("/api/token/club/campaign?length="+pageSize+"&offset="+campaigns.Length+"&name="+t_search);
+        auto result = API::CallLiveApiPath("/api/token/club/campaign?length="+count+"&offset="+offset+"&name="+t_search);
         if (requestedSearch != t_search) {
             // Search term changed while we were loading
             return;
         }
         Json::Value items = result["clubCampaignList"];
-        moreavailable = items.Length == pageSize;
         for (uint i = 0; i < items.Length; i++) {
             auto json = Json::Object();
             json["id"] = items[i]["id"];

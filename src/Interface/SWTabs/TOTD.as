@@ -1,8 +1,5 @@
 class TOTDSelectSWTab : CampaignListSWTab
 {
-
-    TOTDSelectSWTab() {}
-
     string GetLabel() override { return Icons::Calendar + " Tracks of The Day"; }
 
     vec4 GetColor() override { return vec4(0.217, 0.569, 0.61, 1); }
@@ -19,13 +16,10 @@ class TOTDSelectSWTab : CampaignListSWTab
         return monthStrings[month - 1];
     }
 
-    void Load() override {
-        if (campaigns.Length >= request || !moreavailable) return;
-        auto result = API::CallLiveApiPath("/api/token/campaign/month?length="+pageSize+"&offset="+campaigns.Length);
+    void LoadCampaigns(int count, int offset) override {
+        auto result = API::CallLiveApiPath("/api/token/campaign/month?length="+count+"&offset="+(offset+1)); //offset+1 to skip current month
         auto items = result["monthList"];
-        moreavailable = items.Length == pageSize;
-        
-        for(int i = 1; i < items.Length; i++) {//ignore index 0, because we can't speedrun the current TOTD month
+        for(int i = 0; i < items.Length; i++) {
             auto json = Json::Object();
             json["id"] = (items[i]["year"] - 2020) * 12 + items[i]["month"];
             json["name"] = GetMonthName(items[i]["month"]) + " " + Json::Write(items[i]["year"]);
@@ -35,9 +29,7 @@ class TOTDSelectSWTab : CampaignListSWTab
                 json["mapUids"].Add(items[i]["days"][j]["mapUid"]);
             }
             CampaignSummary@ totd = CampaignSummary(json);
-            if (i > 0 && Permissions::PlayPastOfficialMonthlyCampaign())
-                campaigns.InsertLast(totd);
-            else if (i == 0)
+            if ((i > 0 && Permissions::PlayPastOfficialMonthlyCampaign()) || i == 0)
                 campaigns.InsertLast(totd);
         }
     }

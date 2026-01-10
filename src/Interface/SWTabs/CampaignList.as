@@ -15,6 +15,18 @@ class CampaignListSWTab : SWTab
         campaigns.RemoveRange(0, campaigns.Length);
     }
 
+    void Load() override {
+        if (moreavailable && campaigns.Length < request) {
+            LoadCampaigns(pageSize, campaigns.Length);
+            moreavailable = (campaigns.Length % pageSize) == 0;
+            trace(moreavailable);
+            trace(campaigns.Length);
+            trace(pageSize);
+        }
+    }
+
+    void LoadCampaigns(int count, int offset){}
+
     void RenderHeader(){}
 
     void RenderReloadButton()

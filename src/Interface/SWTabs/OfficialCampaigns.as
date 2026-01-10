@@ -6,11 +6,9 @@ class OfficialCampaignsSelectSWTab : CampaignListSWTab
 
     bool IsVisible() override { return Permissions::PlayCurrentOfficialQuarterlyCampaign(); }
 
-    void Load() override{
-        if (campaigns.Length >= request || !moreavailable) return;
-        auto result = API::CallLiveApiPath("/api/campaign/official?length="+pageSize+"&offset="+campaigns.Length);
+    void LoadCampaigns(int count, int offset) override {
+        auto result = API::CallLiveApiPath("/api/campaign/official?length="+count+"&offset="+offset);
         Json::Value items = result["campaignList"];
-        moreavailable = items.Length == pageSize;
         for (uint i = 0; i < items.Length; i++) {
             auto json = Json::Object();
             json["id"] = items[i]["id"];
